@@ -1,0 +1,35 @@
+name: RSS Feed Checker
+
+on:
+  schedule:
+    - cron:  '*/15 * * * *'
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v4.0.1
+        with:
+          go-version: 1.20.5
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Run
+        run: go run main.go
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_user_name: painhardcore # defaults to "github-actions[bot]"
+          commit_user_email: painhardcore@gmail.com # defaults to "41898282+github-actions[bot]@users.noreply.github.com"
+          commit_author: Andrey Yurchenkov <painhardcore@gmail.com> # defaults to author of the commit that triggered the run
+          commit_message: Save the latest RSS feed items

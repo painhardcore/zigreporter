@@ -18,7 +18,7 @@ type FeedConfig struct {
 }
 
 const (
-	ChatID int64 = -826746820 // ID of the Telegram chat to send messages to
+	ChatID int64 = -1001533442735 // ID of the Telegram chat to send messages to
 )
 
 // RSS feeds and their message format

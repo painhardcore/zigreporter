@@ -77,11 +77,11 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 	}
 
 	fmt.Printf("New item found in feed %s\n", url)
-	setLastItem(url, latestItem.GUID)
 
 	fieldValues := getFieldValues(latestItem, feedConfig.Fields)
 	message := fmt.Sprintf(feedConfig.Template, fieldValues...)
 	sendMessage(botToken, ChatID, message)
+	setLastItem(url, latestItem.GUID)
 }
 
 // Retrieve the values of the specified fields from a feed item

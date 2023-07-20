@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"io/ioutil"
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -52,7 +53,10 @@ func sendMessage(botToken string, chatID int64, text string) {
 	bot, _ := tgbotapi.NewBotAPI(botToken)
 	msg := tgbotapi.NewMessage(chatID, text)
 	msg.ParseMode = "Markdown"
-	bot.Send(msg)
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Fatalf("Error sending message: %s", err)
+	}
 }
 
 // Process a feed: fetch the latest item and send it to the Telegram chat if it's new

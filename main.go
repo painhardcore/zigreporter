@@ -19,7 +19,8 @@ type FeedConfig struct {
 }
 
 const (
-	ChatID int64 = -1001533442735 // ID of the Telegram chat to send messages to
+	// ChatID is the ID of the Telegram chat to send messages to
+	ChatID int64 = -1001533442735
 )
 
 // RSS feeds and their message format
@@ -84,7 +85,9 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 	setLastItem(url, latestItem.GUID)
 }
 
-// Retrieve the values of the specified fields from a feed item
+// getFieldValues retrieves the values of the specified fields from a feed item.
+// It takes an item of type *gofeed.Item and a slice of strings representing the fields to retrieve.
+// It returns a slice of interface{} containing the values of the specified fields.
 func getFieldValues(item *gofeed.Item, fields []string) []interface{} {
 	fieldValues := make([]interface{}, len(fields))
 	for i, fieldName := range fields {

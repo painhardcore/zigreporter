@@ -52,10 +52,11 @@ func getFileName(url string) string {
 }
 
 // Send a message to a Telegram chat
-func sendMessage(botToken string, chatID int64, text string) {
+func sendMessage(botToken string, chatID int64, text string, disablePreview bool) {
 	bot, _ := tgbotapi.NewBotAPI(botToken)
 	msg := tgbotapi.NewMessage(chatID, text)
 	msg.ParseMode = "Markdown"
+	msg.DisableWebPagePreview = disablePreview
 	_, err := bot.Send(msg)
 	if err != nil {
 		log.Fatalf("Error sending message: %s", err)
@@ -83,7 +84,7 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 
 	fieldValues := getFieldValues(latestItem, feedConfig.Fields)
 	message := fmt.Sprintf(feedConfig.Template, fieldValues...)
-	sendMessage(botToken, ChatID, message)
+	sendMessage(botToken, ChatID, message, false)
 	setLastItem(url, latestItem.GUID)
 }
 
@@ -139,9 +140,23 @@ func processJSONFeed(url string, botToken string) {
 		return
 	}
 
-	message := fmt.Sprintf("🚀 New dev version: [%s](https://ziglang.org/download)", latestVersion)
-	sendMessage(botToken, ChatID, message)
+	message := generateMessage(latestVersion)
+	sendMessage(botToken, ChatID, message, true)
 	setLastItem(url, latestVersion)
+}
+
+func generateMessage(version string) string {
+	parts := strings.Split(version, "+")
+	if len(parts) != 2 {
+		return fmt.Sprintf("🚀 New dev version: [%s](https://ziglang.org/download)", version)
+	}
+
+	versionPart := parts[0]
+	commitHash := parts[1]
+
+	return fmt.Sprintf(
+		"🚀 New dev version: [%s](https://ziglang.org/download) | Commit: [%s](https://github.com/ziglang/zig/commits/%s)",
+		versionPart, commitHash, commitHash)
 }
 
 func main() {

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -108,6 +110,40 @@ func escapeMarkdown(text string) string {
 	return text
 }
 
+type ZigVersion struct {
+	Master struct {
+		Version string `json:"version"`
+	} `json:"master"`
+}
+
+func processJSONFeed(url string, botToken string) {
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("Failed to fetch %s: %v", url, err)
+		return
+	}
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+	var versionData ZigVersion
+	if err := decoder.Decode(&versionData); err != nil {
+		log.Fatalf("Failed to decode JSON: %v", err)
+		return
+	}
+
+	latestVersion := versionData.Master.Version
+	lastVersion := getLastItem(url)
+
+	if strings.Compare(lastVersion, latestVersion) == 0 {
+		fmt.Printf("No new version found in feed %s\n", url)
+		return
+	}
+
+	message := fmt.Sprintf("🚀 New dev version: [%s](https://ziglang.org/download)", latestVersion)
+	sendMessage(botToken, ChatID, message)
+	setLastItem(url, latestVersion)
+}
+
 func main() {
 	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if botToken == "" {
@@ -120,4 +156,5 @@ func main() {
 	for url, feedConfig := range feeds {
 		processFeed(fp, url, feedConfig, botToken)
 	}
+	processJSONFeed("https://ziglang.org/download/index.json", botToken)
 }

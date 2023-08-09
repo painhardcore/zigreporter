@@ -45,7 +45,7 @@ git clone https://github.com/your_repository_name/zig_reporter_bot.git
 ```
 2. Navigate into the directory:
 ```bash
-cd zig_reporter_bot`
+cd zig_reporter_bot
 ```
 3. Run the application:
 ```bash

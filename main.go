@@ -140,23 +140,25 @@ func processJSONFeed(url string, botToken string) {
 		return
 	}
 
-	message := generateMessage(latestVersion)
+	message := generateMessage(latestVersion, lastVersion)
 	sendMessage(botToken, ChatID, message, true)
 	setLastItem(url, latestVersion)
 }
 
-func generateMessage(version string) string {
-	parts := strings.Split(version, "+")
-	if len(parts) != 2 {
-		return fmt.Sprintf("🚀 New dev version: [%s](https://ziglang.org/download)", version)
+func generateMessage(latestVersion, lastVersion string) string {
+	partsLatest := strings.Split(latestVersion, "+")
+	partsLast := strings.Split(lastVersion, "+")
+
+	if len(partsLatest) != 2 || len(partsLast) != 2 {
+		return fmt.Sprintf("🚀 New dev version: [%s](https://ziglang.org/download)", latestVersion)
 	}
 
-	versionPart := parts[0]
-	commitHash := parts[1]
+	latestCommitHash := partsLatest[1]
+	lastCommitHash := partsLast[1]
 
 	return fmt.Sprintf(
-		"🚀 New dev version: [%s](https://ziglang.org/download) | Commit: [%s](https://github.com/ziglang/zig/commits/%s)",
-		versionPart, commitHash, commitHash)
+		"🚀 New dev version: [%s](https://ziglang.org/download) | [Changes](https://github.com/ziglang/zig/compare/%s...%s)",
+		partsLatest[0], lastCommitHash, latestCommitHash)
 }
 
 func main() {

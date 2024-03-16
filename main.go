@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -42,7 +41,7 @@ func getLastItem(url string) string {
 
 // Save the ID of the last processed item to the file
 func setLastItem(url string, lastItem string) {
-	ioutil.WriteFile("last"+string(os.PathSeparator)+getFileName(url), []byte(lastItem), 0o644)
+	_ = os.WriteFile("last"+string(os.PathSeparator)+getFileName(url), []byte(lastItem), 0o644)
 }
 
 // Generate a file name based on the feed URL
@@ -80,11 +79,22 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 		return
 	}
 
-	fmt.Printf("New item found in feed %s\n", url)
-
-	fieldValues := getFieldValues(latestItem, feedConfig.Fields)
-	message := fmt.Sprintf(feedConfig.Template, fieldValues...)
-	sendMessage(botToken, ChatID, message, false)
+	fmt.Printf("New items found in feed: %s\n", url)
+	found := false
+	// Iterate over the items in reverse order to send the oldest first
+	for i := len(feed.Items) - 1; i >= 0; i-- {
+		if strings.Compare(lastItem, feed.Items[i].GUID) == 0 {
+			found = true
+			continue
+		}
+		if found {
+			fieldValues := getFieldValues(feed.Items[i], feedConfig.Fields)
+			message := fmt.Sprintf(feedConfig.Template, fieldValues...)
+			sendMessage(botToken, ChatID, message, false)
+			setLastItem(url, feed.Items[i].GUID)
+		}
+	}
+	// Save the latest item to the file
 	setLastItem(url, latestItem.GUID)
 }
 

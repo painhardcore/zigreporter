@@ -9,15 +9,13 @@ jobs:
   run:
     runs-on: ubuntu-latest
     permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the
-      # added or changed files to the repository.
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go
-        uses: actions/setup-go@v4.0.1
+        uses: actions/setup-go@v5.0.0
         with:
-          go-version: 1.22
+          go-version: '1.22'
 
       - name: Get dependencies
         run: go mod download

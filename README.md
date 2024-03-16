@@ -41,7 +41,7 @@ This token can also be securely stored as a secret in your GitHub repository set
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your_repository_name/zig_reporter_bot.git
+git clone https://github.com/painhardcore/zig_reporter_bot.git
 ```
 2. Navigate into the directory:
 ```bash

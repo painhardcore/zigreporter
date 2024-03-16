@@ -1,0 +1,39 @@
+name: code check and test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v5.0.0
+        with:
+          go-version: '1.22'
+
+      - name: Get dependencies
+        run: go mod download 
+
+      - name: Go Mod Verify
+        run: go mod verify
+
+      - name: Go Format
+        run: go fmt ./... && git diff --exit-code
+
+      - name: Go Vet
+        run: go vet ./...
+
+      - name: Go Tidy
+        run: |
+          go mod tidy && git diff --exit-code
+
+      - name: Go Test
+        run: go test -race -shuffle=on ./...

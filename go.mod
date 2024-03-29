@@ -1,4 +1,4 @@
-module zig-rss
+module github.com/painhardcore/zigreporter
 
 go 1.20
 

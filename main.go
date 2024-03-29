@@ -12,6 +12,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	gofeed "github.com/mmcdole/gofeed"
+	"github.com/painhardcore/zigreporter/word"
 )
 
 type FeedConfig struct {
@@ -167,8 +168,8 @@ func generateMessage(latestVersion, lastVersion string) string {
 	lastCommitHash := partsLast[1]
 
 	return fmt.Sprintf(
-		"🚀 New dev version: [%s](https://ziglang.org/download) | [Changes](https://github.com/ziglang/zig/compare/%s...%s)",
-		partsLatest[0], lastCommitHash, latestCommitHash)
+		"🚀 New %s dev version: [%s](https://ziglang.org/download) | [Changes](https://github.com/ziglang/zig/compare/%s...%s)",
+		word.RandomReleaseWord(), partsLatest[0], lastCommitHash, latestCommitHash)
 }
 
 func main() {

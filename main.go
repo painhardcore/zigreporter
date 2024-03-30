@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"html"
 	"log"
-	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -13,6 +11,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	gofeed "github.com/mmcdole/gofeed"
 	"github.com/painhardcore/zigreporter/word"
+	"github.com/painhardcore/zigreporter/ziglang"
 )
 
 type FeedConfig struct {
@@ -53,11 +52,15 @@ func getFileName(url string) string {
 
 // Send a message to a Telegram chat
 func sendMessage(botToken string, chatID int64, text string, disablePreview bool) {
-	bot, _ := tgbotapi.NewBotAPI(botToken)
+	bot, err := tgbotapi.NewBotAPI(botToken)
+	if err != nil {
+		log.Printf("Losing message: %s", text)
+		log.Fatalf("Error creating bot: %s", err)
+	}
 	msg := tgbotapi.NewMessage(chatID, text)
 	msg.ParseMode = "Markdown"
 	msg.DisableWebPagePreview = disablePreview
-	_, err := bot.Send(msg)
+	_, err = bot.Send(msg)
 	if err != nil {
 		log.Fatalf("Error sending message: %s", err)
 	}
@@ -128,32 +131,22 @@ type ZigVersion struct {
 	} `json:"master"`
 }
 
-func processJSONFeed(url string, botToken string) {
-	resp, err := http.Get(url)
+func processDevZigVersions(botToken string) {
+	latestVersion, err := ziglang.GetLatestMasteVersion()
 	if err != nil {
-		log.Fatalf("Failed to fetch %s: %v", url, err)
-		return
-	}
-	defer resp.Body.Close()
-
-	decoder := json.NewDecoder(resp.Body)
-	var versionData ZigVersion
-	if err := decoder.Decode(&versionData); err != nil {
-		log.Fatalf("Failed to decode JSON: %v", err)
-		return
+		log.Fatalf("Error getting latest version: %s", err)
 	}
 
-	latestVersion := versionData.Master.Version
-	lastVersion := getLastItem(url)
+	lastStoredVersion := getLastItem(ziglang.ZigLangVerionsURL)
 
-	if strings.Compare(lastVersion, latestVersion) == 0 {
-		fmt.Printf("No new version found in feed %s\n", url)
+	if strings.Compare(lastStoredVersion, latestVersion) == 0 {
+		fmt.Printf("No new version found in feed %s\n", ziglang.ZigLangVerionsURL)
 		return
 	}
 
-	message := generateMessage(latestVersion, lastVersion)
+	message := generateMessage(latestVersion, lastStoredVersion)
 	sendMessage(botToken, ChatID, message, true)
-	setLastItem(url, latestVersion)
+	setLastItem(ziglang.ZigLangVerionsURL, latestVersion)
 }
 
 func generateMessage(latestVersion, lastVersion string) string {
@@ -184,5 +177,5 @@ func main() {
 	for url, feedConfig := range feeds {
 		processFeed(fp, url, feedConfig, botToken)
 	}
-	processJSONFeed("https://ziglang.org/download/index.json", botToken)
+	processDevZigVersions(botToken)
 }

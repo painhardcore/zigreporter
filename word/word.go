@@ -53,6 +53,7 @@ var funnyWords = []string{
 	"fantasmic",
 	"spectacular",
 	"bodacious",
+	"blazingly fast",
 }
 
 // RandomReleaseWord makes no sense, but it's fun

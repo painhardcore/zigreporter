@@ -1,1 +1,1 @@
-https://ziglang.org/news/welcome-matthew-lugg/
+https://ziglang.org/news/carmen-the-allocgator/

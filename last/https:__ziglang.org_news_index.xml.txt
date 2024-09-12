@@ -1,1 +1,1 @@
-https://ziglang.org/news/carmen-the-allocgator/
+https://ziglang.org/news/migrate-to-self-hosting/

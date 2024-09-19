@@ -28,7 +28,7 @@ const (
 var feeds = map[string]FeedConfig{
 	"https://ziglang.org/news/index.xml":       {Template: "Ziglang News 📰:\n*%s*\n\n%s [read](%s)", Fields: []string{"Title", "Link"}},
 	"https://github.com/ziglang/zig/tags.atom": {Template: "🚀 New Zig release: *%s*\n\n[Link to release](%s)", Fields: []string{"Title", "Link"}},
-	"https://ziglang.org/devlog/index.xml":     {Template: "Devlog 📰:\n*%s*\n[read](%s)", Fields: []string{"Title", "Link"}},
+	"https://ziglang.org/devlog/index.xml":     {Template: "🆕 Devlog: [%s](%s)", Fields: []string{"Title", "Link"}},
 }
 
 // Retrieve the last processed item from the file
@@ -86,6 +86,10 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 
 	fmt.Printf("New items found in feed: %s\n", url)
 	found := false
+	if lastItem == "" {
+		fmt.Printf("No last item - starting from the start\n")
+		found = true
+	}
 	// Iterate over the items in reverse order to send the oldest first
 	for i := len(feed.Items) - 1; i >= 0; i-- {
 		if strings.Compare(lastItem, feed.Items[i].GUID) == 0 {
@@ -96,7 +100,6 @@ func processFeed(fp *gofeed.Parser, url string, feedConfig FeedConfig, botToken 
 			fieldValues := getFieldValues(feed.Items[i], feedConfig.Fields)
 			message := fmt.Sprintf(feedConfig.Template, fieldValues...)
 			sendMessage(botToken, ChatID, message, false)
-			setLastItem(url, feed.Items[i].GUID)
 		}
 	}
 	// Save the latest item to the file
@@ -111,7 +114,7 @@ func getFieldValues(item *gofeed.Item, fields []string) []interface{} {
 	for i, fieldName := range fields {
 		value := reflect.ValueOf(item).Elem().FieldByName(fieldName).Interface()
 		if str, ok := value.(string); ok {
-			value = escapeMarkdown(html.UnescapeString(str))
+			value = html.UnescapeString(str)
 		}
 		fieldValues[i] = value
 	}

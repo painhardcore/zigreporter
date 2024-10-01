@@ -26,7 +26,7 @@ const (
 
 // RSS feeds and their message format
 var feeds = map[string]FeedConfig{
-	"https://ziglang.org/news/index.xml":       {Template: "Ziglang News 📰:\n*%s*\n\n%s [read](%s)", Fields: []string{"Title", "Link"}},
+	"https://ziglang.org/news/index.xml":       {Template: "Ziglang News 📰:\n*%s*\n [read](%s)", Fields: []string{"Title", "Link"}},
 	"https://github.com/ziglang/zig/tags.atom": {Template: "🚀 New Zig release: *%s*\n\n[Link to release](%s)", Fields: []string{"Title", "Link"}},
 	"https://ziglang.org/devlog/index.xml":     {Template: "🆕 Devlog: [%s](%s)", Fields: []string{"Title", "Link"}},
 }

@@ -109,7 +109,7 @@ var funnyWords = []string{
 	"slick",
 	"smooth",
 	"sparkling",
-	 "lit af",
+	"lit af",
 	"no cap",
 	"yeet",
 	"gucci",

@@ -1,1 +1,1 @@
-https://ziglang.org/news/0.14.0-delayed/
+https://ziglang.org/news/announcing-community-mirrors/

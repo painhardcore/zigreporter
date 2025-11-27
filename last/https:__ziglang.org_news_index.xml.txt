@@ -1,1 +1,1 @@
-https://ziglang.org/news/first-outage/
+https://ziglang.org/news/migrating-from-github-to-codeberg/

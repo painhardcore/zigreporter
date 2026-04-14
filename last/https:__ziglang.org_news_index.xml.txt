@@ -1,1 +1,1 @@
-https://ziglang.org/news/migrating-from-github-to-codeberg/
+https://ziglang.org/news/0.16.0-released/

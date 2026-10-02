@@ -1,1 +1,1 @@
-https://ziglang.org/news/welcoming-new-team-members/
+https://ziglang.org/news/0.17.0-released/
